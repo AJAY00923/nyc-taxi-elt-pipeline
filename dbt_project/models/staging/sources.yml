@@ -1,0 +1,40 @@
+version: 2
+
+sources:
+  - name: raw
+    database: NYC_TAXI
+    schema: RAW
+    description: "Raw NYC TLC trip data loaded by Airflow ingestion pipeline"
+    freshness:
+      warn_after: {count: 35, period: day}
+      error_after: {count: 65, period: day}
+    loaded_at_field: _INGESTED_AT
+
+    tables:
+      - name: raw_yellow_trips
+        description: "Raw yellow taxi trip records from NYC TLC open data"
+        columns:
+          - name: TPEP_PICKUP_DATETIME
+            description: "Trip pickup timestamp"
+            tests:
+              - not_null
+          - name: TPEP_DROPOFF_DATETIME
+            description: "Trip dropoff timestamp"
+            tests:
+              - not_null
+          - name: TOTAL_AMOUNT
+            description: "Total fare charged to passenger"
+            tests:
+              - not_null
+          - name: PULOCATIONID
+            description: "TLC taxi zone ID for pickup"
+            tests:
+              - not_null
+          - name: DOLOCATIONID
+            description: "TLC taxi zone ID for dropoff"
+            tests:
+              - not_null
+          - name: _SOURCE_MONTH
+            description: "YYYY-MM of the source file this row came from"
+            tests:
+              - not_null

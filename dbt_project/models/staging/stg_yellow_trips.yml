@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg_yellow_trips
+    description: >
+      Cleaned and standardized yellow taxi trip records.
+      Filters out bad data (negative fares, impossible timestamps).
+      No business logic — pure cleaning and casting.
+    columns:
+      - name: pickup_at
+        description: "Trip pickup timestamp (UTC)"
+        tests:
+          - not_null
+      - name: dropoff_at
+        description: "Trip dropoff timestamp (UTC)"
+        tests:
+          - not_null
+      - name: pickup_location_id
+        description: "TLC taxi zone for pickup (1–265)"
+        tests:
+          - not_null
+      - name: dropoff_location_id
+        description: "TLC taxi zone for dropoff (1–265)"
+        tests:
+          - not_null
+      - name: trip_distance_miles
+        description: "Distance of the trip in miles"
+        tests:
+          - not_null
+      - name: total_amount
+        description: "Total amount charged to passenger"
+        tests:
+          - not_null
+      - name: payment_type
+        description: "Decoded payment method"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['credit_card', 'cash', 'no_charge', 'dispute', 'unknown', 'voided_trip']
+      - name: trip_duration_minutes
+        description: "Duration of trip in minutes"
+        tests:
+          - not_null
+      - name: source_month
+        description: "YYYY-MM of source file"
+        tests:
+          - not_null

@@ -1,0 +1,60 @@
+name: dbt CI — test on every PR
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "dbt_project/**"
+      - ".github/workflows/dbt_ci.yml"
+
+jobs:
+  dbt-test:
+    name: Run dbt tests
+    runs-on: ubuntu-latest
+
+    env:
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dbt
+        run: |
+          pip install dbt-snowflake==1.7.0
+
+      - name: dbt debug — verify connection
+        working-directory: dbt_project
+        run: dbt debug --profiles-dir . --target prod
+
+      - name: dbt deps — install packages
+        working-directory: dbt_project
+        run: dbt deps --profiles-dir .
+
+      - name: dbt compile — check SQL is valid
+        working-directory: dbt_project
+        run: dbt compile --profiles-dir . --target prod
+
+      - name: dbt run — staging only (CI runs staging, not full pipeline)
+        working-directory: dbt_project
+        run: dbt run --select staging --profiles-dir . --target prod
+
+      - name: dbt test — run all tests
+        working-directory: dbt_project
+        run: dbt test --profiles-dir . --target prod
+
+      - name: Upload dbt artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: dbt_project/target/
+          retention-days: 7

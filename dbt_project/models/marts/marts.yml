@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: mart_daily_trip_summary
+    description: >
+      Daily aggregated trip metrics by time-of-day bucket.
+      Primary mart for dashboards and analyst queries.
+      Grain: one row per (pickup_date, time_of_day).
+    columns:
+      - name: pickup_date
+        description: "Date of trip pickup"
+        tests:
+          - not_null
+      - name: time_of_day
+        description: "Time-of-day bucket"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['morning_rush', 'midday', 'evening_rush', 'night', 'overnight']
+      - name: total_trips
+        description: "Count of trips in this date/time bucket"
+        tests:
+          - not_null
+      - name: total_revenue
+        description: "Sum of total_amount for all trips"
+        tests:
+          - not_null
+      - name: avg_fare
+        description: "Average total fare per trip"
+        tests:
+          - not_null
+
+  - name: mart_zone_performance
+    description: >
+      Monthly revenue and volume metrics per pickup zone.
+      Grain: one row per (source_month, pickup_location_id).
+    columns:
+      - name: source_month
+        description: "YYYY-MM of the trips"
+        tests:
+          - not_null
+      - name: pickup_location_id
+        description: "TLC taxi zone ID (1–265)"
+        tests:
+          - not_null
+      - name: total_trips
+        description: "Total trips originating from this zone in the month"
+        tests:
+          - not_null
+      - name: revenue_rank
+        description: "Zone revenue rank within the month (1 = highest)"
+        tests:
+          - not_null

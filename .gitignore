@@ -1,0 +1,33 @@
+# Environment
+.env
+*.env
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# Great Expectations
+great_expectations/uncommitted/
+great_expectations/.gitignore
+
+# Airflow
+logs/
+airflow.db
+airflow.cfg
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Temp files
+*.parquet
+*.csv
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: int_trips_enriched
+    description: >
+      Enriched trip records with business logic, derived metrics, and classification flags.
+      Incremental — only processes new source months not already loaded.
+      Grain: one row per raw trip record (same as staging, just enriched).
+    columns:
+      - name: pickup_at
+        description: "Trip pickup timestamp"
+        tests:
+          - not_null
+          - no_future_dates
+      - name: trip_duration_minutes
+        description: "Duration in minutes"
+        tests:
+          - not_null
+          - reasonable_trip_duration:
+              min_minutes: 1
+              max_minutes: 300
+      - name: fare_amount
+        description: "Base fare charged"
+        tests:
+          - not_null
+          - positive_values
+      - name: total_amount
+        description: "Total amount charged including all fees"
+        tests:
+          - not_null
+          - positive_values
+      - name: time_of_day
+        description: "Time-of-day bucket derived from pickup hour"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['morning_rush', 'midday', 'evening_rush', 'night', 'overnight']
+      - name: trip_distance_category
+        description: "Short / medium / long / very_long bucket"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['short', 'medium', 'long', 'very_long']
+      - name: is_weekend
+        description: "True if pickup was on Saturday or Sunday"
+        tests:
+          - not_null
+      - name: is_airport_trip
+        description: "True if pickup or dropoff was at JFK, LGA, or EWR zone"
+        tests:
+          - not_null
+      - name: source_month
+        description: "YYYY-MM of source file — used for incremental logic"
+        tests:
+          - not_null

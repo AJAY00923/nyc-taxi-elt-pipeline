@@ -1,0 +1,26 @@
+# NYC Taxi ELT Pipeline — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Airflow (install separately via official docs — not via pip directly for production)
+# apache-airflow==2.9.0
+apache-airflow-providers-snowflake==5.3.0
+
+# Snowflake
+snowflake-connector-python==3.8.0
+snowflake-sqlalchemy==1.5.3
+
+# Data processing
+pandas==2.2.0
+pyarrow==15.0.0
+
+# dbt
+dbt-core==1.7.0
+dbt-snowflake==1.7.0
+
+# Data quality
+great-expectations==0.18.12
+
+# Utilities
+requests==2.31.0
+faker==24.0.0         # used in project 2 (streaming) for fake event generation
+python-dotenv==1.0.1  # loads .env file locally
