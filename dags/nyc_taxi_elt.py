@@ -131,7 +131,7 @@ def ingest_to_snowflake(**context):
             "passenger_count", "trip_distance", "PULocationID",
             "DOLocationID", "payment_type", "fare_amount",
             "tip_amount", "tolls_amount", "total_amount",
-            "congestion_surcharge", "airport_fee",
+            "congestion_surcharge",
         ]
 
         df = pd.read_parquet(tmp_path, columns=columns_needed)
