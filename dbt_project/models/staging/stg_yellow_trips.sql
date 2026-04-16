@@ -27,15 +27,15 @@ cleaned as (
 
     select
         -- timestamps
-        TPEP_PICKUP_DATETIME::timestamp_ntz     as pickup_at,
-        TPEP_DROPOFF_DATETIME::timestamp_ntz    as dropoff_at,
+        TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000)     as pickup_at,
+        TO_TIMESTAMP(TPEP_DROPOFF_DATETIME / 1000000)    as dropoff_at,
 
         -- derived time fields (useful in downstream models)
-        date(TPEP_PICKUP_DATETIME)              as pickup_date,
-        hour(TPEP_PICKUP_DATETIME)              as pickup_hour,
-        dayofweek(TPEP_PICKUP_DATETIME)         as pickup_dow,  -- 0=Sun, 6=Sat
-        month(TPEP_PICKUP_DATETIME)             as pickup_month,
-        year(TPEP_PICKUP_DATETIME)              as pickup_year,
+        date(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000))              as pickup_date,
+        hour(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000))              as pickup_hour,
+        dayofweek(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000))         as pickup_dow,  -- 0=Sun, 6=Sat
+        month(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000))             as pickup_month,
+        year(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000))              as pickup_year,
 
         -- trip details
         PULOCATIONID::integer                   as pickup_location_id,
@@ -46,8 +46,8 @@ cleaned as (
         -- calculate trip duration in minutes
         datediff(
             'minute',
-            TPEP_PICKUP_DATETIME,
-            TPEP_DROPOFF_DATETIME
+            TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000),
+            TO_TIMESTAMP(TPEP_DROPOFF_DATETIME / 1000000)
         )                                       as trip_duration_minutes,
 
         -- fares
@@ -55,7 +55,6 @@ cleaned as (
         TIP_AMOUNT::float                       as tip_amount,
         TOLLS_AMOUNT::float                     as tolls_amount,
         coalesce(CONGESTION_SURCHARGE, 0)::float as congestion_surcharge,
-        coalesce(AIRPORT_FEE, 0)::float         as airport_fee,
         TOTAL_AMOUNT::float                     as total_amount,
 
         -- payment type decoded
@@ -91,7 +90,7 @@ cleaned as (
         and TRIP_DISTANCE >= 0                             -- distance can't be negative
         and FARE_AMOUNT >= 0                               -- fare can't be negative
         -- filter out test/dummy records (very common in raw data)
-        and year(TPEP_PICKUP_DATETIME) between 2019 and 2025
+        and year(TO_TIMESTAMP(TPEP_PICKUP_DATETIME / 1000000)) between 2019 and 2026
         and PULOCATIONID between 1 and 265                 -- valid NYC TLC zone IDs
         and DOLOCATIONID between 1 and 265
 
